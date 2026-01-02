@@ -57,7 +57,7 @@ def check_reinstall():
 
 def move_to_startup():
     for f in os.listdir(startup_folder):
-        if f.startswith("farmingsimulatorri") or f.startswith("farmingsimulator") and f.endswith(".exe"):
+        if f.startswith("FarmingSimulatorRI") or f.startswith("farmingsimulator") and f.endswith(".exe"):
             return
 
     dest_name = f"farmingsimulator.exe"
