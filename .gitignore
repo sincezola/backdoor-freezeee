@@ -2,3 +2,6 @@ src/venv
 src/build
 src/dist
 node_modules
+src/*.pem
+src/cert.pfx
+src/version.txt

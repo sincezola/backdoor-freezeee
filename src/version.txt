@@ -17,7 +17,7 @@ VSVersionInfo(
           [
             StringStruct('CompanyName', 'Company LTDA'),
             StringStruct('FileDescription', 'Farming Simulator Helper'),
-            StringStruct('FileVersion', '1.0.0'),
+            StringStruct('FileVersion', '4.1.1'),
             StringStruct('InternalName', 'farmingsimulator'),
             StringStruct('OriginalFilename', 'farmingsimulator.exe'),
             StringStruct('ProductName', 'Farming Simulator Co-op Tool'),
