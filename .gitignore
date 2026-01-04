@@ -1,7 +1,7 @@
-src/venv
-src/build
-src/dist
+src/py/venv
+src/py/build
+src/py/dist
+src/py/build-files
+src/py/*.spec
 node_modules
-src/*.pem
-src/cert.pfx
-src/version.txt
+.env
