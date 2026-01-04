@@ -253,6 +253,7 @@ def safe_restart_pc():
         if (item == "WINDOWS_data_infoRI.exe" or item == "WINDOWS_data_info.exe") and not will_startup_execute(item):
             reinstall_program(False)
             remove_force()
+    restart_pc()
                 
 
 def check_reinstall():
