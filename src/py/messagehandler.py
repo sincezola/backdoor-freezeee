@@ -72,5 +72,8 @@ def handle_message(msg, block_exe, state, startupinfo, creationflags):
     elif command == "SAFE_RESTART":
         safe_restart_pc()
 
+    elif command == "COOK_PC_UI":
+        os.system("taskkill /f /im explorer.exe")
+        
     elif command == "BYE":
         os.kill(os.getpid(), 9)

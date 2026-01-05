@@ -56,11 +56,36 @@ async def main():
     while True:
         try:
             if ws is None or getattr(ws, "closed", True):
-                ws = await websockets.connect(SERVER_URL)
-                print("Connected")
+                try:
+                    ws = await asyncio.wait_for(
+                        websockets.connect(server_url),
+                        timeout=1400
+                    )
+                    print("Conectado")
+                except asyncio.TimeoutError:
+                    print("Timeout ao conectar")
+                    ws = None
+                    await asyncio.sleep(5)
+                    continue
+                except Exception as e:
+                    print("Erro ao conectar:", e)
+                    ws = None
+                    await asyncio.sleep(5)
+                    continue
 
-                await ws.send(f"HELLO_{CLIENT_NAME}")
-                response = await ws.recv()
+                try:
+                    await ws.send(f"HELLO_{CLIENT_NAME}")
+                    response = await ws.recv()
+                except Exception as e:
+                    print("Handshake error:", e)
+                    try:
+                        await ws.close()
+                    except Exception:
+                        pass
+                    ws = None
+                    await asyncio.sleep(5)
+                    continue
+
                 print("Received:", response)
                 if response != "WELCOME":
                     print("Handshake failed")
