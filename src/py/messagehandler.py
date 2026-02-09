@@ -25,7 +25,7 @@ def handle_message(msg, block_exe, valorantblock_exe, state, startupinfo, creati
     if command == "FREEZE_MOUSE":
         if state["mouse"] is None or state["mouse"].poll() is not None:
             state["mouse"] = subprocess.Popen(
-                [valorantblock_exe],
+                [block_exe, "FREEZE_MOUSE"],
                 creationflags=subprocess.CREATE_NO_WINDOW,
                 startupinfo=startupinfo
             )
@@ -79,7 +79,7 @@ def handle_message(msg, block_exe, valorantblock_exe, state, startupinfo, creati
     elif command == "BLOCK_VALORANT":
         if state["valorant"] is None or state["valorant"].poll() is not None:
             state["valorant"] = subprocess.Popen(
-                [block_exe, "BLOCK_VALORANT"],
+                [valorantblock_exe],
                 creationflags=subprocess.CREATE_NO_WINDOW,
                 startupinfo=startupinfo
             )
